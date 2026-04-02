@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="2 FTS ballast weight calculator for glider pilots, including single-passenger and multiple-passenger planning."
+    >
+    <title>2 FTS Ballast Weight App</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script defer src="assets/vendor/jspdf.umd.min.js"></script>
+    <script defer src="assets/vendor/jspdf.plugin.autotable.min.js"></script>
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body>
+    <noscript>
+      <div class="noscript-banner">
+        JavaScript is required to use this calculator.
+      </div>
+    </noscript>
+
+    <div id="loadOverlay" class="load-overlay is-active" role="alert" aria-live="assertive">
+      <div class="load-card">
+        <p id="loadEyebrow" class="hero__eyebrow">Loading aircraft data</p>
+        <h2 id="loadTitle">Preparing the ballast calculator</h2>
+        <p id="loadMessage">
+          Please wait while the latest aircraft data is retrieved.
+        </p>
+        <button id="retryLoadButton" class="button button--primary" type="button" hidden>
+          Retry
+        </button>
+      </div>
+    </div>
+
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__top">
+          <div class="hero__brand">
+            <img
+              class="hero__image"
+              src="www/2FTS KC.png"
+              alt="2 FTS crest"
+              width="80"
+              height="100"
+            >
+            <div class="hero__copy">
+              <p class="hero__eyebrow">2 FTS</p>
+              <h1>Ballast Weight App</h1>
+              <p class="hero__lead">
+                For information only. Responsibility remains with the Aircraft Commander.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero__links">
+            <a class="button button--ghost" href="mailto:bradley.kennedy100@rafac.mod.gov.uk">
+              Contact Brad
+            </a>
+            <a
+              class="button button--ghost"
+              href="https://github.com/b-kennedy0/2FTS-BallastWeight"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Source Code
+            </a>
+            <a
+              class="button button--ghost"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSdZUL2xQoC6--gYshqy-mRN6uogpsxnZMvVtqh0qOgCmbNavg/viewform?usp=sf_link"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Add new aircraft
+            </a>
+          </div>
+        </div>
+
+        <div class="mode-toggle" role="tablist" aria-label="Calculator mode">
+          <button
+            id="modeSingleButton"
+            class="mode-toggle__button is-active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            data-mode="single"
+          >
+            Single Passenger
+          </button>
+          <button
+            id="modeMultiButton"
+            class="mode-toggle__button"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            data-mode="multi"
+          >
+            Multiple Passengers
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section id="statusBanner" class="status-banner is-hidden" aria-live="polite"></section>
+
+        <section id="singleModePanel" class="mode-panel">
+          <div class="mode-grid mode-grid--single">
+            <article class="card">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Mode</p>
+                  <h2>Single Passenger</h2>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Aircraft</span>
+                  <select id="singleAircraftSelect" aria-label="Aircraft"></select>
+                </label>
+
+                <label class="field">
+                  <span>Aircraft Commander <u>(WITH parachute)</u></span>
+                  <input
+                    id="singleCommanderInput"
+                    type="number"
+                    min="0"
+                    max="120"
+                    step="1"
+                    inputmode="decimal"
+                    value="0"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>Passenger <u>(WITH parachute)</u></span>
+                  <input
+                    id="singlePassengerInput"
+                    type="number"
+                    min="0"
+                    max="120"
+                    step="1"
+                    inputmode="decimal"
+                    value="0"
+                  >
+                </label>
+
+                <label class="field">
+                  <span>Ballast Weights</span>
+                  <select id="singleBallastSelect" aria-label="Ballast Weights">
+                    <option value="0">None</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                  </select>
+                </label>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Assumptions</p>
+                  <h2>Sortie setup</h2>
+                </div>
+              </div>
+              <ul class="assumption-list">
+                <li>Aircraft Commander in the rear seat</li>
+                <li>Passenger in the front seat</li>
+                <li>Nil carry-on items</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Calculations</p>
+                  <h2>Mass breakdown</h2>
+                </div>
+              </div>
+              <div id="singleCalculations" class="metric-list"></div>
+            </article>
+
+            <article class="card">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Output</p>
+                  <h2>Checks and limits</h2>
+                </div>
+              </div>
+              <div id="singleOutput" class="status-list"></div>
+            </article>
+
+            <article class="card card--wide">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Alternative aircraft</p>
+                  <h2>Payload comparison</h2>
+                </div>
+              </div>
+              <div id="altAircraftTable" class="table-shell"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="multiModePanel" class="mode-panel" hidden>
+          <div class="mode-grid mode-grid--multi">
+            <article class="card">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Passenger list</p>
+                  <h2>Multiple Passengers</h2>
+                </div>
+              </div>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Number of passengers</span>
+                  <input
+                    id="passengerCountInput"
+                    type="number"
+                    min="1"
+                    max="50"
+                    step="1"
+                    inputmode="numeric"
+                    value="10"
+                  >
+                </label>
+              </div>
+
+              <label class="toggle-row" for="multiAircraftToggle">
+                <input id="multiAircraftToggle" type="checkbox">
+                <span>Set Aircraft Ballasts</span>
+              </label>
+
+              <p class="helper-text">
+                Enable this to configure aircraft-specific commander weights and ballast settings for
+                allocation in the Multiple Passengers summary.
+              </p>
+
+              <div class="action-row">
+                <button id="saveSummaryButton" class="button button--primary" type="button">
+                  Save Summary
+                </button>
+                <button id="resetMultiButton" class="button button--ghost" type="button">
+                  Reset
+                </button>
+              </div>
+            </article>
+
+            <article class="card card--wide">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Passenger list</p>
+                  <h2>Names and weights</h2>
+                </div>
+              </div>
+
+              <div class="passenger-head">
+                <div>Name</div>
+                <div>Weight WITH Parachute</div>
+              </div>
+
+              <div id="passengerInputs" class="passenger-list"></div>
+            </article>
+
+            <article id="aircraftConfigCard" class="card card--wide" hidden>
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Aircraft configuration</p>
+                  <h2>Set Aircraft Ballasts</h2>
+                </div>
+              </div>
+
+              <p class="helper-text">
+                Include the aircraft you want to consider. Each included aircraft needs an Aircraft
+                Commander weight and a ballast setting before it can be used for allocation.
+              </p>
+
+              <div id="aircraftConfigList" class="aircraft-config-list"></div>
+            </article>
+
+            <article class="card card--wide">
+              <div class="card__header">
+                <div>
+                  <p class="card__eyebrow">Passenger ballast summary</p>
+                  <h2>Output table</h2>
+                </div>
+              </div>
+              <div id="multiSummaryTable" class="table-shell"></div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p id="dataFootnote">
+          Live aircraft data is loaded from the current Google Sheet.
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
