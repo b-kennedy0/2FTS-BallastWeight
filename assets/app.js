@@ -3,6 +3,7 @@
 
   const GOOGLE_SHEET_ID = "1aS6l4KAXX7iuvSSfA6OlkYIlC_eF3POd";
   const GOOGLE_SHEET_URL = `https://docs.google.com/uc?id=${GOOGLE_SHEET_ID}&export=download`;
+  const LOCAL_AIRCRAFT_DATA_URL = "assets/aircraft_weights.csv";
   const DEFAULT_PASSENGER_COUNT = 10;
   const MAX_PASSENGERS = 50;
   const MIN_PASSENGERS = 1;
@@ -182,17 +183,18 @@
     });
 
     try {
-      const response = await fetch(GOOGLE_SHEET_URL, { cache: "no-store" });
+      let aircraftData;
+      let sourceLabel;
+      let statusMessage = "";
 
-      if (!response.ok) {
-        throw new Error(`Aircraft data request failed with status ${response.status}.`);
-      }
-
-      const csvText = await response.text();
-      const aircraftData = normaliseAircraftRows(parseCsv(csvText));
-
-      if (!aircraftData.length) {
-        throw new Error("No aircraft were found in the Google Sheet.");
+      try {
+        aircraftData = await fetchAircraftData(GOOGLE_SHEET_URL);
+        sourceLabel = "live Google Sheet";
+      } catch (liveError) {
+        aircraftData = await fetchAircraftData(`${LOCAL_AIRCRAFT_DATA_URL}?v=${Date.now()}`);
+        sourceLabel = "bundled aircraft data";
+        statusMessage = `Live aircraft data could not be reached (${liveError.message}). Using bundled aircraft data instead.`;
+        elements.dataFootnote.textContent = "Using bundled aircraft data because the live Google Sheet could not be reached.";
       }
 
       state.aircraftData = aircraftData;
@@ -202,17 +204,38 @@
       renderAircraftConfigSection();
       renderAll();
       hideLoadState();
-      setBanner(`${aircraftData.length} aircraft loaded from the live Google Sheet.`, "info");
-      elements.dataFootnote.textContent = `${aircraftData.length} aircraft loaded from the current Google Sheet.`;
+      if (sourceLabel === "live Google Sheet") {
+        setBanner(`${aircraftData.length} aircraft loaded from the live Google Sheet.`, "info");
+        elements.dataFootnote.textContent = `${aircraftData.length} aircraft loaded from the current Google Sheet.`;
+      } else {
+        setBanner(statusMessage || `${aircraftData.length} aircraft loaded from bundled aircraft data.`, "info");
+      }
     } catch (error) {
       showLoadState({
         eyebrow: "Aircraft data unavailable",
         title: "The calculator could not load the live aircraft list",
-        message: `${error.message} Please retry. If the error persists, check the Google Sheet link or network access.`,
+        message: `${error.message} Please retry. If the error persists, check the Google Sheet link, the bundled CSV, or network access.`,
         canRetry: true
       });
       setBanner("Aircraft data could not be loaded. Retry is required before calculations can run.", "danger");
     }
+  }
+
+  async function fetchAircraftData(url) {
+    const response = await fetch(url, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error(`Aircraft data request failed with status ${response.status}.`);
+    }
+
+    const csvText = await response.text();
+    const aircraftData = normaliseAircraftRows(parseCsv(csvText));
+
+    if (!aircraftData.length) {
+      throw new Error("No aircraft were found in the aircraft data source.");
+    }
+
+    return aircraftData;
   }
 
   function setMode(mode) {
