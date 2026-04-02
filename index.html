@@ -227,6 +227,19 @@
                 allocation in the Multiple Passengers summary.
               </p>
 
+              <div id="multiAircraftPickerField" class="field" hidden>
+                <span>Select aircraft for allocation</span>
+                <details id="multiAircraftPicker" class="aircraft-picker">
+                  <summary id="multiAircraftPickerSummary" class="aircraft-picker__summary">
+                    Choose aircraft
+                  </summary>
+                  <div id="multiAircraftPickerList" class="aircraft-picker__panel"></div>
+                </details>
+                <p class="field__hint">
+                  Selected aircraft will appear in Aircraft Configuration below.
+                </p>
+              </div>
+
               <div class="action-row">
                 <button id="saveSummaryButton" class="button button--primary" type="button">
                   Download PDF
@@ -262,7 +275,7 @@
               </div>
 
               <p class="helper-text">
-                Include the aircraft you want to consider. Each included aircraft needs an Aircraft
+                Configure the aircraft selected above. Each selected aircraft needs an Aircraft
                 Commander weight and a ballast setting before it can be used for allocation.
               </p>
 

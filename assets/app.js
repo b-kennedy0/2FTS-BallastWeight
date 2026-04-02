@@ -47,6 +47,7 @@
       passengerCount: DEFAULT_PASSENGER_COUNT,
       passengers: buildPassengerList(DEFAULT_PASSENGER_COUNT),
       allocationEnabled: false,
+      selectedAircraft: [],
       aircraftConfigs: {}
     }
   };
@@ -89,6 +90,10 @@
     elements.altAircraftTable = document.getElementById("altAircraftTable");
     elements.passengerCountInput = document.getElementById("passengerCountInput");
     elements.multiAircraftToggle = document.getElementById("multiAircraftToggle");
+    elements.multiAircraftPickerField = document.getElementById("multiAircraftPickerField");
+    elements.multiAircraftPicker = document.getElementById("multiAircraftPicker");
+    elements.multiAircraftPickerSummary = document.getElementById("multiAircraftPickerSummary");
+    elements.multiAircraftPickerList = document.getElementById("multiAircraftPickerList");
     elements.saveSummaryButton = document.getElementById("saveSummaryButton");
     elements.resetMultiButton = document.getElementById("resetMultiButton");
     elements.passengerInputs = document.getElementById("passengerInputs");
@@ -135,6 +140,7 @@
 
     elements.multiAircraftToggle.addEventListener("change", (event) => {
       state.multi.allocationEnabled = event.target.checked;
+      renderAircraftPicker();
       renderAircraftConfigSection();
       renderMultiSummary();
     });
@@ -166,6 +172,7 @@
       renderMultiSummary();
     });
 
+    elements.multiAircraftPickerList.addEventListener("change", handleAircraftPickerChange);
     elements.aircraftConfigList.addEventListener("input", handleAircraftConfigInteraction);
     elements.aircraftConfigList.addEventListener("change", handleAircraftConfigInteraction);
     elements.saveSummaryButton.addEventListener("click", saveSummaryPdf);
@@ -186,11 +193,12 @@
       seedSingleAircraftSelection();
       seedAircraftConfigs();
       renderSingleAircraftOptions();
+      renderAircraftPicker();
       renderAircraftConfigSection();
       renderAll();
       hideLoadState();
-      setBanner(`${aircraftData.length} aircraft loaded from the site CSV.`, "info");
-      elements.dataFootnote.textContent = `${aircraftData.length} aircraft loaded from the site CSV and maintained through GitHub submissions.`;
+      clearBanner();
+      console.info(`Loaded ${aircraftData.length} aircraft from assets/aircraft_weights.csv.`);
     } catch (error) {
       showLoadState({
         eyebrow: "Aircraft data unavailable",
@@ -234,6 +242,7 @@
   function renderAll() {
     renderSingleOutputs();
     renderPassengerInputs();
+    renderAircraftPicker();
     renderAircraftConfigSection();
     renderMultiSummary();
   }
@@ -339,21 +348,28 @@
 
   function renderAircraftConfigSection() {
     elements.multiAircraftToggle.checked = state.multi.allocationEnabled;
+    elements.multiAircraftPickerField.hidden = !state.multi.allocationEnabled;
     elements.aircraftConfigCard.hidden = !state.multi.allocationEnabled;
 
     if (!state.multi.allocationEnabled) {
       return;
     }
 
+    const selectedAircraft = getSelectedAircraftNames(state.multi);
+
+    if (!selectedAircraft.length) {
+      elements.aircraftConfigList.innerHTML = `<div class="empty-state">Select one or more aircraft above to configure them here.</div>`;
+      return;
+    }
+
     const cards = state.aircraftData
+      .filter((aircraft) => selectedAircraft.includes(aircraft.aircraft))
       .map((aircraft) => {
         const config = state.multi.aircraftConfigs[aircraft.aircraft] || createAircraftConfig();
         const validation = getAircraftConfigValidation(config);
         const classes = [
           "aircraft-config-card",
-          config.included ? "" : "is-inactive",
-          config.included && validation.valid ? "is-valid" : "",
-          config.included && !validation.valid ? "is-invalid" : ""
+          validation.valid ? "is-valid" : "is-invalid"
         ]
           .filter(Boolean)
           .join(" ");
@@ -365,15 +381,6 @@
                 <p class="aircraft-config-card__name">${escapeHtml(aircraft.aircraft)}</p>
                 <p class="aircraft-config-card__weight">Aircraft weight: ${formatWeight(aircraft.weight)} kg</p>
               </div>
-              <label class="aircraft-config-card__include">
-                <input
-                  type="checkbox"
-                  data-field="included"
-                  ${config.included ? "checked" : ""}
-                  aria-label="Include ${escapeAttribute(aircraft.aircraft)}"
-                >
-                <span>Include</span>
-              </label>
             </div>
             <div class="aircraft-config-card__fields">
               <label class="field">
@@ -416,6 +423,41 @@
       .join("");
 
     elements.aircraftConfigList.innerHTML = cards;
+  }
+
+  function renderAircraftPicker() {
+    elements.multiAircraftToggle.checked = state.multi.allocationEnabled;
+    elements.multiAircraftPickerField.hidden = !state.multi.allocationEnabled;
+
+    if (!state.multi.allocationEnabled) {
+      if (elements.multiAircraftPicker) {
+        elements.multiAircraftPicker.open = false;
+      }
+      return;
+    }
+
+    const selectedAircraft = getSelectedAircraftNames(state.multi);
+    elements.multiAircraftPickerList.innerHTML = state.aircraftData
+      .map((aircraft) => {
+        const checked = selectedAircraft.includes(aircraft.aircraft) ? "checked" : "";
+
+        return `
+          <label class="aircraft-picker__option">
+            <input
+              type="checkbox"
+              value="${escapeAttribute(aircraft.aircraft)}"
+              ${checked}
+            >
+            <span>${escapeHtml(aircraft.aircraft)}</span>
+            <span class="aircraft-picker__meta">${formatWeight(aircraft.weight)} kg</span>
+          </label>
+        `;
+      })
+      .join("");
+
+    elements.multiAircraftPickerSummary.textContent = selectedAircraft.length
+      ? `${selectedAircraft.length} aircraft selected`
+      : "Choose aircraft";
   }
 
   function renderMultiSummary() {
@@ -461,10 +503,6 @@
       return;
     }
 
-    if (target.dataset.field === "included") {
-      config.included = Boolean(target.checked);
-    }
-
     if (target.dataset.field === "commanderWeight") {
       syncBoundedNumberInput(target, 0, MAX_WEIGHT);
       config.commanderWeight = target.value;
@@ -478,12 +516,24 @@
     renderMultiSummary();
   }
 
+  function handleAircraftPickerChange() {
+    state.multi.selectedAircraft = Array.from(
+      elements.multiAircraftPickerList.querySelectorAll("input[type='checkbox']:checked")
+    ).map((input) => input.value);
+
+    renderAircraftPicker();
+    renderAircraftConfigSection();
+    renderMultiSummary();
+  }
+
   function resetMultiMode() {
     state.multi.passengerCount = DEFAULT_PASSENGER_COUNT;
     state.multi.passengers = buildPassengerList(DEFAULT_PASSENGER_COUNT);
     state.multi.allocationEnabled = false;
+    state.multi.selectedAircraft = [];
     seedAircraftConfigs(true);
     renderPassengerInputs();
+    renderAircraftPicker();
     renderAircraftConfigSection();
     renderMultiSummary();
   }
@@ -568,7 +618,9 @@
   }
 
   function buildMultiSummaryTableModel(multiState, aircraftData) {
-    const validConfigs = multiState.allocationEnabled ? getValidAircraftConfigs(aircraftData, multiState.aircraftConfigs) : [];
+    const validConfigs = multiState.allocationEnabled
+      ? getValidAircraftConfigs(aircraftData, multiState.aircraftConfigs, multiState.selectedAircraft)
+      : [];
     const showAllocation = multiState.allocationEnabled && validConfigs.length > 0;
     const columns = [
       { key: "passenger", label: "Passenger" },
@@ -776,13 +828,19 @@
     };
   }
 
-  function getValidAircraftConfigs(aircraftData, configsByAircraft) {
+  function getValidAircraftConfigs(aircraftData, configsByAircraft, selectedAircraftNames) {
+    const selectedAircraftSet = new Set(selectedAircraftNames || []);
+
     return aircraftData
       .map((aircraft) => {
+        if (!selectedAircraftSet.has(aircraft.aircraft)) {
+          return null;
+        }
+
         const config = configsByAircraft[aircraft.aircraft];
         const validation = getAircraftConfigValidation(config);
 
-        if (!config || !config.included || !validation.valid) {
+        if (!config || !validation.valid) {
           return null;
         }
 
@@ -816,11 +874,11 @@
   }
 
   function getAircraftConfigValidation(config) {
-    if (!config || !config.included) {
+    if (!config) {
       return {
         valid: false,
-        message: "Select Include to use this aircraft in allocation.",
-        className: ""
+        message: "Select this aircraft above to configure it.",
+        className: "validation-note--warning"
       };
     }
 
@@ -867,9 +925,8 @@
     }
 
     const validation = getAircraftConfigValidation(config);
-    card.classList.toggle("is-inactive", !config.included);
-    card.classList.toggle("is-valid", config.included && validation.valid);
-    card.classList.toggle("is-invalid", config.included && !validation.valid);
+    card.classList.toggle("is-valid", validation.valid);
+    card.classList.toggle("is-invalid", !validation.valid);
 
     const ballastMassField = card.querySelector("[data-display='ballastMass']");
     if (ballastMassField) {
@@ -932,10 +989,13 @@
 
   function createAircraftConfig() {
     return {
-      included: false,
       commanderWeight: "",
       ballastCount: ""
     };
+  }
+
+  function getSelectedAircraftNames(multiState) {
+    return Array.isArray(multiState.selectedAircraft) ? multiState.selectedAircraft : [];
   }
 
   function showLoadState({ eyebrow, title, message, canRetry }) {
@@ -953,6 +1013,11 @@
   function setBanner(message, tone) {
     elements.statusBanner.className = `status-banner status-banner--${tone}`;
     elements.statusBanner.textContent = message;
+  }
+
+  function clearBanner() {
+    elements.statusBanner.className = "status-banner is-hidden";
+    elements.statusBanner.textContent = "";
   }
 
   function renderMetric(label, value, note, danger) {

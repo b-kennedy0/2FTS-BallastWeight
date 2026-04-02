@@ -272,6 +272,13 @@ main {
   font-weight: 700;
 }
 
+.field__hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .field input,
 .field select,
 .passenger-row input,
@@ -498,6 +505,75 @@ main {
   height: 1.1rem;
 }
 
+.aircraft-picker {
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.aircraft-picker[open] {
+  box-shadow: 0 0 0 4px rgba(31, 122, 140, 0.12);
+}
+
+.aircraft-picker__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3rem;
+  padding: 0.8rem 0.9rem;
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.aircraft-picker__summary::-webkit-details-marker {
+  display: none;
+}
+
+.aircraft-picker__summary::after {
+  content: "▾";
+  flex: 0 0 auto;
+  color: var(--accent);
+  transition: transform 160ms ease;
+}
+
+.aircraft-picker[open] .aircraft-picker__summary::after {
+  transform: rotate(180deg);
+}
+
+.aircraft-picker__panel {
+  display: grid;
+  gap: 0.45rem;
+  max-height: 15rem;
+  overflow-y: auto;
+  padding: 0 0.7rem 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
+.aircraft-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.2rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.aircraft-picker__option input {
+  width: 1.05rem;
+  height: 1.05rem;
+  min-height: auto;
+  padding: 0;
+}
+
+.aircraft-picker__meta {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
 .passenger-head,
 .passenger-row {
   display: grid;
@@ -556,25 +632,6 @@ main {
 .aircraft-config-card__fields {
   display: grid;
   gap: 0.8rem;
-}
-
-.aircraft-config-card__include {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-weight: 800;
-  color: var(--brand-strong);
-}
-
-.aircraft-config-card__include input {
-  width: 1.1rem;
-  height: 1.1rem;
-  min-height: auto;
-  padding: 0;
-}
-
-.aircraft-config-card.is-inactive {
-  opacity: 0.72;
 }
 
 .aircraft-config-card.is-invalid {
