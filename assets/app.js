@@ -1,8 +1,6 @@
 (function (global) {
   "use strict";
 
-  const GOOGLE_SHEET_ID = "1aS6l4KAXX7iuvSSfA6OlkYIlC_eF3POd";
-  const GOOGLE_SHEET_URL = `https://docs.google.com/uc?id=${GOOGLE_SHEET_ID}&export=download`;
   const LOCAL_AIRCRAFT_DATA_URL = "assets/aircraft_weights.csv";
   const DEFAULT_PASSENGER_COUNT = 10;
   const MAX_PASSENGERS = 50;
@@ -178,25 +176,12 @@
     showLoadState({
       eyebrow: "Loading aircraft data",
       title: "Preparing the ballast calculator",
-      message: "Please wait while the latest aircraft data is retrieved.",
+      message: "Please wait while the aircraft data file is loaded.",
       canRetry: false
     });
 
     try {
-      let aircraftData;
-      let sourceLabel;
-      let statusMessage = "";
-
-      try {
-        aircraftData = await fetchAircraftData(GOOGLE_SHEET_URL);
-        sourceLabel = "live Google Sheet";
-      } catch (liveError) {
-        aircraftData = await fetchAircraftData(`${LOCAL_AIRCRAFT_DATA_URL}?v=${Date.now()}`);
-        sourceLabel = "bundled aircraft data";
-        statusMessage = `Live aircraft data could not be reached (${liveError.message}). Using bundled aircraft data instead.`;
-        elements.dataFootnote.textContent = "Using bundled aircraft data because the live Google Sheet could not be reached.";
-      }
-
+      const aircraftData = await fetchAircraftData(`${LOCAL_AIRCRAFT_DATA_URL}?v=${Date.now()}`);
       state.aircraftData = aircraftData;
       seedSingleAircraftSelection();
       seedAircraftConfigs();
@@ -204,17 +189,13 @@
       renderAircraftConfigSection();
       renderAll();
       hideLoadState();
-      if (sourceLabel === "live Google Sheet") {
-        setBanner(`${aircraftData.length} aircraft loaded from the live Google Sheet.`, "info");
-        elements.dataFootnote.textContent = `${aircraftData.length} aircraft loaded from the current Google Sheet.`;
-      } else {
-        setBanner(statusMessage || `${aircraftData.length} aircraft loaded from bundled aircraft data.`, "info");
-      }
+      setBanner(`${aircraftData.length} aircraft loaded from the site CSV.`, "info");
+      elements.dataFootnote.textContent = `${aircraftData.length} aircraft loaded from the site CSV and maintained through GitHub submissions.`;
     } catch (error) {
       showLoadState({
         eyebrow: "Aircraft data unavailable",
-        title: "The calculator could not load the live aircraft list",
-        message: `${error.message} Please retry. If the error persists, check the Google Sheet link, the bundled CSV, or network access.`,
+        title: "The calculator could not load the aircraft list",
+        message: `${error.message} Please retry. If the error persists, check the deployed CSV file or network access.`,
         canRetry: true
       });
       setBanner("Aircraft data could not be loaded. Retry is required before calculations can run.", "danger");

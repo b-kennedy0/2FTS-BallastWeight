@@ -1,0 +1,36 @@
+name: Add aircraft
+description: Submit a new aircraft tail number and weight for the ballast calculator data file.
+title: "Add aircraft: "
+labels:
+  - aircraft-submission
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Submit the aircraft details below and the repository automation will prepare a pull request to update `assets/aircraft_weights.csv`.
+
+  - type: input
+    id: aircraft_tail_number
+    attributes:
+      label: Aircraft tail number
+      description: Use the tail number or aircraft label exactly as it should appear in the calculator.
+      placeholder: ZE999
+    validations:
+      required: true
+
+  - type: input
+    id: aircraft_weight
+    attributes:
+      label: Aircraft weight (kg)
+      description: Enter the aircraft weight in kilograms.
+      placeholder: 416.25
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have checked the aircraft tail number and weight before submitting.
+          required: true
