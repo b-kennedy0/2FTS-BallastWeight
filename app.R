@@ -277,7 +277,7 @@ server <- function(input, output, session) {
   output$images <- renderUI({
     tags$div(
       img(
-        src = "632crest.png",
+        src = "2FTS KC.png",
         width = 80,
         height = 100,
         style = "float:left;"
