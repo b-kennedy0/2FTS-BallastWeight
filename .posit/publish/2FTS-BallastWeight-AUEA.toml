@@ -9,7 +9,8 @@ validate = true
 files = [
   '/app.R',
   '/.posit/publish/Ballast-AUEA.toml',
-  '/.posit/publish/deployments/deployment-Q806.toml'
+  '/.posit/publish/deployments/deployment-Q806.toml',
+  '/www'
 ]
 title = 'Ballast'
 
