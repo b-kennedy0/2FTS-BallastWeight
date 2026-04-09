@@ -263,6 +263,19 @@ main {
   letter-spacing: -0.02em;
 }
 
+.card__header--simple {
+  margin-bottom: 0.7rem;
+}
+
+.card__header--simple h2 {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
 .field-grid {
   display: grid;
   gap: 0.9rem;
@@ -501,10 +514,45 @@ main {
 
 .helper-text,
 .validation-note,
-.footer p {
+.footer__credit {
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.help-main {
+  display: grid;
+  gap: 1rem;
+}
+
+.help-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.help-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.help-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.help-list,
+.help-steps {
+  margin: 0;
+  padding-left: 1.2rem;
+  line-height: 1.7;
+}
+
+.help-note {
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .action-row {
@@ -679,13 +727,17 @@ main {
 
 .footer {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1rem;
   padding: 1rem 0 0;
+  border-top: 1px solid var(--line);
 }
 
 .footer__credit {
   font-size: 0.82rem;
+  max-width: 44rem;
 }
 
 .footer__credit a {
@@ -694,6 +746,26 @@ main {
 
 .footer__credit a:hover,
 .footer__credit a:focus-visible {
+  text-decoration: underline;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.footer__links a {
+  color: var(--brand-strong);
+  text-decoration: none;
+}
+
+.footer__links a:hover,
+.footer__links a:focus-visible {
   text-decoration: underline;
 }
 
@@ -801,6 +873,14 @@ main {
   .mode-grid--multi .card--wide:nth-of-type(4) {
     grid-column: 1 / -1;
   }
+
+  .help-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .help-card--wide {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 699px) {
@@ -824,5 +904,33 @@ main {
 
   .data-table {
     min-width: 34rem;
+  }
+
+  .mode-grid--single .card--single-assumptions {
+    order: -1;
+  }
+
+  .mode-grid--single .card--single-inputs {
+    order: 0;
+  }
+
+  .mode-grid--single .card--single-calculations {
+    order: 1;
+  }
+
+  .mode-grid--single .card--single-output {
+    order: 2;
+  }
+
+  .mode-grid--single .card--single-alt {
+    order: 3;
+  }
+
+  .footer {
+    flex-direction: column;
+  }
+
+  .footer__links {
+    justify-content: flex-start;
   }
 }

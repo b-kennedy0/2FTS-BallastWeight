@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Help and usage guide for the 2 FTS ballast weight calculator."
+    >
+    <title>Help | 2 FTS Ballast Weight App</title>
+    <link rel="icon" type="image/png" href="www/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="www/favicon.svg" />
+    <link rel="shortcut icon" href="www/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="www/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Ballast App" />
+    <link rel="manifest" href="www/site.webmanifest" />
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero__top">
+          <div class="hero__brand">
+            <img
+              class="hero__image"
+              src="www/2FTS KC.png"
+              alt="2 FTS crest"
+              width="80"
+              height="100"
+            >
+            <div class="hero__copy">
+              <p class="hero__eyebrow">2 FTS</p>
+              <h1>Help</h1>
+              <p class="hero__lead">
+                Find out more about this app, and how to use it. If you have any questions or suggestions, please get in touch using the details below.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero__links">
+            <a class="button button--ghost" href="index.html"><- Back to calculator</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="help-main">
+        <section class="help-grid">
+          <article class="card help-card">
+            <div class="card__header">
+              <div>
+                <p class="card__eyebrow">Overview</p>
+              </div>
+            </div>
+            <p>
+              The 2 FTS Ballast Weight App is a planning tool/aid for Aircraft Commanders to check ballast requirements for
+              single-passenger and multiple-passenger scenarios.
+            </p>
+            <p>
+              It uses the aircraft data packaged with the app to compare payload against aircraft
+              weight limits and to show whether ballast is required, permitted, or not allowed.
+            </p>
+            <div class="help-note">
+              The app is for information only. <br>Full responsibility remains with the Aircraft Commander.
+            </div>
+          </article>
+
+          <article class="card help-card">
+            <div class="card__header">
+              <div>
+                <p class="card__eyebrow">Features</p>
+              </div>
+            </div>
+            <ul class="help-list">
+              <li>Single-passenger mode checks for payload, aircraft all-up mass, ballast, and approach speed.</li>
+              <li>Alternative aircraft comparison for the same single-passenger payload.</li>
+              <li>Multiple-passenger summary showing each passenger&apos;s ballast possibilities.</li>
+              <li>Optional aircraft allocation using aircraft-specific commander and ballast settings.</li>
+              <li>PDF export of the multiple-passenger summary.</li>
+            </ul>
+          </article>
+
+          <article class="card help-card">
+            <div class="card__header">
+              <div>
+                <p class="card__eyebrow">How to use Single Mode</p>
+              </div>
+            </div>
+            <ol class="help-steps">
+              <li>Select the <i>desired</i> aircraft.</li>
+              <li>Enter the Aircraft Commander weight <u>with</u> parachute.</li>
+              <li>Enter the passenger weight <u>with</u> parachute.</li>
+              <li>Select how many ballast weights are fitted.</li>
+              <li>Review the calculations, output checks, and alternative aircraft table.</li>
+            </ol>
+          </article>
+
+          <article class="card help-card">
+            <div class="card__header">
+              <div>
+                <p class="card__eyebrow">How to use Multiple Mode</p>
+              </div>
+            </div>
+            <ol class="help-steps">
+              <li>Set the number of passengers you will be entering.</li>
+              <li>Enter each passenger name and weight <u>with</u> parachute.</li>
+              <li>
+                If required, enable <strong>Set Aircraft Ballasts</strong>, choose the available
+                aircraft, then enter each Aircraft Commander weight and ballast setting.
+              </li>
+              <li>Review the summary table for required ballast, permitted ballast, notes, and any aircraft allocation.</li>
+              <li>Use <strong>Download PDF</strong> if you need an exportable summary.</li>
+            </ol>
+          </article>
+
+          <article class="card help-card help-card--wide">
+            <div class="card__header">
+              <div>
+                <p class="card__eyebrow">Assumptions</p>
+              </div>
+            </div>
+            <ul class="help-list">
+              <li>In single-passenger mode, the Aircraft Commander is assumed to be in the rear seat and the passenger in the front seat.</li>
+              <li>Single-passenger mode assumes nil carry-on items.</li>
+              <li>Passenger and commander weights are expected to include parachutes.</li>
+              <li>Outputs depend on the aircraft data currently bundled with the app.</li>
+            </ul>
+          </article>
+
+          <article class="card help-card help-card--wide">
+            <div class="card__header">
+              <div>
+                <p class="card__eyebrow">Troubleshooting / Contact</p>
+              </div>
+            </div>
+            <ul class="help-list">
+              <li>If the aircraft list does not load, refresh the page and try again.</li>
+              <li>If PDF export is unavailable, reload the page so the local PDF libraries can load again.</li>
+              <li>If a weight or ballast output looks unexpected, check that the entered values include parachutes and that the correct aircraft is selected.</li>
+              <li>If the underlying aircraft data needs updating, use the project source repository to raise an issue or propose a change.</li>
+              <div class="help-note">For any feedback or suggestions, you can contact Brad Kennedy using this <a href="https://bradleykennedy.co.uk/contact" target="_blank" rel="noreferrer">contact form</a>.</div>
+            </ul>
+          </article>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p class="footer__credit">
+          &copy; 2026 Bradley Kennedy. Licensed under the
+          <a
+            href="https://github.com/b-kennedy0/2FTS-BallastWeight/blob/master/LICENSE"
+            target="_blank"
+            rel="noreferrer"
+          >
+            MIT License
+          </a>.
+        </p>
+        <div class="footer__links">
+          <a href="help.html" aria-current="page">Help</a>
+          <a href="https://github.com/b-kennedy0/2FTS-BallastWeight" target="_blank" rel="noreferrer">Source</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -647,7 +647,7 @@
     const showAllocation = multiState.allocationEnabled && validConfigs.length > 0;
     const columns = [
       { key: "passenger", label: "Passenger" },
-      { key: "weight", label: "Weight (kg)" },
+      { key: "weight", label: "Weight with Para (KG)" },
       { key: "requiredBallast", label: "Required Ballast" },
       { key: "permittedBallast", label: "Permitted Ballast" },
       { key: "notes", label: "Notes" }

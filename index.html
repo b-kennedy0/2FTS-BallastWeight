@@ -62,15 +62,7 @@
           <div class="hero__links">
             <a
               class="button button--ghost"
-              href="https://github.com/2fts-vgs/ballast"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Source Code
-            </a>
-            <a
-              class="button button--ghost"
-              href="https://github.com/2fts-vgs/ballast/issues/new?template=add-aircraft.yml"
+              href="https://github.com/b-kennedy0/2FTS-BallastWeight/issues/new?template=add-aircraft.yml"
               target="_blank"
               rel="noreferrer"
             >
@@ -108,7 +100,7 @@
 
         <section id="singleModePanel" class="mode-panel">
           <div class="mode-grid mode-grid--single">
-            <article class="card">
+            <article class="card card--single-inputs">
               <div class="field-grid">
                 <label class="field">
                   <span>Aircraft</span>
@@ -152,12 +144,9 @@
               </div>
             </article>
 
-            <article class="card">
-              <div class="card__header">
-                <div>
-                  <p class="card__eyebrow">Assumptions</p>
-                  <h2>Sortie setup</h2>
-                </div>
+            <article class="card card--single-assumptions">
+              <div class="card__header card__header--simple">
+                <h2>Assumptions</h2>
               </div>
               <ul class="assumption-list">
                 <li>Aircraft Commander in the rear seat</li>
@@ -166,32 +155,23 @@
               </ul>
             </article>
 
-            <article class="card">
-              <div class="card__header">
-                <div>
-                  <p class="card__eyebrow">Calculations</p>
-                  <h2>Mass breakdown</h2>
-                </div>
+            <article class="card card--single-calculations">
+              <div class="card__header card__header--simple">
+                <h2>Calculations</h2>
               </div>
               <div id="singleCalculations" class="metric-list"></div>
             </article>
 
-            <article class="card">
-              <div class="card__header">
-                <div>
-                  <p class="card__eyebrow">Output</p>
-                  <h2>Checks and limits</h2>
-                </div>
+            <article class="card card--single-output">
+              <div class="card__header card__header--simple">
+                <h2>Output</h2>
               </div>
               <div id="singleOutput" class="status-list"></div>
             </article>
 
-            <article class="card card--wide">
-              <div class="card__header">
-                <div>
-                  <p class="card__eyebrow">Alternative aircraft</p>
-                  <h2>Payload comparison</h2>
-                </div>
+            <article class="card card--wide card--single-alt">
+              <div class="card__header card__header--simple">
+                <h2>Alternative aircraft</h2>
               </div>
               <div id="altAircraftTable" class="table-shell"></div>
             </article>
@@ -302,9 +282,19 @@
 
       <footer class="footer">
         <p class="footer__credit">
-          Built by
-          <a href="https://bradk.co.uk/contact" target="_blank" rel="noreferrer">Flt Lt B Kennedy</a>
+          &copy; 2026 Bradley Kennedy. Licensed under the
+          <a
+            href="https://github.com/b-kennedy0/2FTS-BallastWeight/blob/master/LICENSE"
+            target="_blank"
+            rel="noreferrer"
+          >
+            MIT License
+          </a>.
         </p>
+        <div class="footer__links">
+          <a href="help.html">Help</a>
+          <a href="https://github.com/b-kennedy0/2FTS-BallastWeight" target="_blank" rel="noreferrer">Source</a>
+        </div>
       </footer>
     </div>
   </body>

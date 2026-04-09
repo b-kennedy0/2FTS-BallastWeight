@@ -1,0 +1,117 @@
+name: Process aircraft submission
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - reopened
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  process-aircraft-submission:
+    if: contains(join(github.event.issue.labels.*.name, ','), 'aircraft-submission')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Process issue into aircraft CSV
+        id: process_issue
+        continue-on-error: true
+        run: node scripts/process-aircraft-issue.mjs
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_CREATED_AT: ${{ github.event.issue.created_at }}
+          CSV_PATH: assets/aircraft_weights.csv
+
+      - name: Comment on invalid submission
+        if: steps.process_issue.outcome != 'success'
+        uses: actions/github-script@v7
+        env:
+          ERROR_MESSAGE: ${{ steps.process_issue.outputs.error_message }}
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const reason = process.env.ERROR_MESSAGE || 'The submission could not be parsed.';
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `The aircraft submission could not be processed automatically.\n\nReason: ${reason}\n\nPlease edit the issue and save it again, or update \`assets/aircraft_weights.csv\` manually.`
+            });
+
+      - name: Stop workflow after invalid submission
+        if: steps.process_issue.outcome != 'success'
+        run: exit 1
+
+      - name: Comment when no CSV change is required
+        if: steps.process_issue.outputs.change_action == 'no-change'
+        uses: actions/github-script@v7
+        env:
+          AIRCRAFT: ${{ steps.process_issue.outputs.aircraft }}
+          WEIGHT: ${{ steps.process_issue.outputs.weight }}
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const aircraft = process.env.AIRCRAFT;
+            const weight = process.env.WEIGHT;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `No update was needed. \`${aircraft}\` is already recorded at \`${weight} kg\` in \`assets/aircraft_weights.csv\`.`
+            });
+
+      - name: Create pull request for aircraft data update
+        id: create_pr
+        if: steps.process_issue.outputs.change_action != 'no-change'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/add-aircraft-${{ github.event.issue.number }}
+          delete-branch: true
+          commit-message: Sync aircraft data from issue #${{ github.event.issue.number }}
+          title: Sync aircraft ${{ steps.process_issue.outputs.aircraft }} from issue #${{ github.event.issue.number }}
+          body: |
+            Updates `assets/aircraft_weights.csv` from issue #${{ github.event.issue.number }}.
+
+            Change type: `${{ steps.process_issue.outputs.change_action }}`
+            Aircraft: `${{ steps.process_issue.outputs.aircraft }}`
+            Weight: `${{ steps.process_issue.outputs.weight }} kg`
+
+            Closes #${{ github.event.issue.number }}
+
+      - name: Comment with pull request link
+        if: steps.process_issue.outputs.change_action != 'no-change' && steps.create_pr.outputs.pull-request-url != ''
+        uses: actions/github-script@v7
+        env:
+          PR_URL: ${{ steps.create_pr.outputs.pull-request-url }}
+        with:
+          script: |
+            const issue_number = context.issue.number;
+            const repo = context.repo.repo;
+            const owner = context.repo.owner;
+            const prUrl = process.env.PR_URL;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: `A pull request has been prepared to update \`assets/aircraft_weights.csv\`: ${prUrl}`
+            });
