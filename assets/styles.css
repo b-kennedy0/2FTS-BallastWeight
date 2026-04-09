@@ -535,10 +535,14 @@ main {
   gap: 1rem;
 }
 
-.help-card p {
+.help-card p:not(.card__eyebrow) {
   margin: 0;
   color: var(--muted);
   line-height: 1.65;
+}
+
+.help-card .card__eyebrow {
+  margin-bottom: 0;
 }
 
 .help-list,
