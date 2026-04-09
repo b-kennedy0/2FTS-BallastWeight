@@ -23,7 +23,7 @@ body:
     attributes:
       label: Aircraft weight (kg)
       description: Enter the aircraft weight in kilograms.
-      placeholder: 416.25
+      placeholder: "416.25"
     validations:
       required: true
 

@@ -36,10 +36,19 @@
       }
 
       element.innerHTML = await response.text();
+      updateFooterYear(element);
       markCurrentFooterLink(element);
     } catch (error) {
       console.error("Shared footer could not be loaded.", error);
     }
+  }
+
+  function updateFooterYear(element) {
+    const currentYear = String(new Date().getFullYear());
+
+    element.querySelectorAll("[data-current-year]").forEach((yearElement) => {
+      yearElement.textContent = currentYear;
+    });
   }
 
   function markCurrentFooterLink(element) {
